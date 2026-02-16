@@ -3,8 +3,6 @@ name: Build DUKATOR EXE
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -25,6 +23,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller==6.3.0
+        pip list
+    
+    - name: Create hook for customtkinter
+      run: |
+        New-Item -ItemType Directory -Force -Path "hooks"
+        @"
+        from PyInstaller.utils.hooks import collect_all, collect_data_files
+        
+        datas = collect_data_files('customtkinter')
+        hiddenimports = [
+            'customtkinter',
+            'customtkinter.windows',
+            'customtkinter.windows.widgets',
+            'customtkinter.windows.widgets.core_rendering',
+            'customtkinter.windows.widgets.core_rendering.ctk_canvas',
+            'customtkinter.windows.widgets.core_rendering.draw_engine',
+            'customtkinter.windows.widgets.theme',
+            'customtkinter.windows.widgets.scaling',
+        ]
+        binaries = []
+        "@ | Out-File -FilePath "hooks\hook-customtkinter.py" -Encoding utf8
     
     - name: Build EXE
       run: |
@@ -34,6 +53,7 @@ jobs:
           --windowed `
           --clean `
           --noconfirm `
+          --additional-hooks-dir=hooks `
           --add-data="src/config.py;." `
           --add-data="src/core;core" `
           --add-data="src/gui;gui" `
@@ -42,6 +62,8 @@ jobs:
           --hidden-import=customtkinter.windows `
           --hidden-import=customtkinter.windows.widgets `
           --hidden-import=customtkinter.windows.widgets.core_rendering `
+          --hidden-import=customtkinter.windows.widgets.theme `
+          --hidden-import=customtkinter.windows.widgets.scaling `
           --hidden-import=yt_dlp `
           --hidden-import=yt_dlp.extractor `
           --hidden-import=yt_dlp.postprocessor `
@@ -67,7 +89,8 @@ jobs:
       run: |
         if (Test-Path "dist/DUKATOR.exe") {
           Write-Host "✅ Build successful"
-          Get-Item "dist/DUKATOR.exe"
+          $size = (Get-Item "dist/DUKATOR.exe").Length / 1MB
+          Write-Host "Size: $([math]::Round($size, 1)) MB"
         } else {
           Write-Host "❌ Build failed"
           exit 1
