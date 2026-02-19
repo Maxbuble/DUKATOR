@@ -12,41 +12,92 @@ Descargador de música multiplataforma para Windows y macOS.
 - ⬇️ **Alta calidad** - Descarga en MP3 320kbps
 - 🏷️ **Metadatos** - Añade automáticamente título, artista, álbum y portada
 
+## Plataformas Soportadas
+
+| Plataforma | Estado | Descarga |
+|------------|--------|----------|
+| ✅ **Windows** | Soportado | `DUKATOR.exe` (incluye FFmpeg) |
+| ✅ **macOS ARM** (M1/M2/M3) | Soportado | `DUKATOR-ARM.app` (requiere FFmpeg) |
+| ⚠️ **macOS Intel** | [Compilar desde código](#macos-intel) | No hay build automático |
+
 ## Requisitos
 
 ### Windows
-- Python 3.12+ (incluido en el exe)
-- FFmpeg (incluido en la carpeta)
+- Windows 10/11 (64-bit)
+- FFmpeg incluido en el ejecutable
 
-### macOS
-- Python 3.12
-- FFmpeg (se instala automáticamente con Homebrew)
+### macOS ARM (M1/M2/M3)
+- macOS 12.0 o superior
+- FFmpeg: `brew install ffmpeg`
 
-## Uso Rápido
+### macOS Intel
+- macOS 10.15 o superior
+- [Compilar desde código fuente](#compilar-desde-código)
 
-### Windows
- simplemente ejecuta `DUKATOR.exe`
+## Descargas
 
-### Desde código fuente (cualquier OS)
+Ve a [Releases](https://github.com/Maxbuble/DUKATOR/releases) para descargar la última versión.
+
+### Instrucciones de uso
+
+#### Windows
+1. Descargar `DUKATOR.exe` del release
+2. Ejecutar directamente
+
+#### macOS ARM (M1/M2/M3)
+1. Descargar `DUKATOR-ARM.app` del release
+2. Si aparece error de seguridad: **Clic derecho → Abrir → Abrir de todos modos**
+3. Instalar FFmpeg: `brew install ffmpeg`
+
+#### macOS Intel
+Ver [Compilar desde código](#compilar-desde-código)
+
+## Compilar desde código
+
+### Requisitos previos
+- Python 3.12 o superior
+- FFmpeg instalado
+- pip
+
+### Paso a paso
+
 ```bash
+# Clonar el repositorio
+git clone https://github.com/Maxbuble/DUKATOR.git
+cd DUKATOR
+
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Ejecutar
-python dukator.py
-```
-
-## Compilar
-
-### Windows
-```bash
+# Compilar
+# Windows:
 .\compilar_final.bat
-```
 
-### macOS
-```bash
+# macOS (cualquier arquitectura):
 chmod +x compilar_mac.sh
 ./compilar_mac.sh
+```
+
+El ejecutable se creará en la carpeta `dist/`.
+
+## Compilar para macOS Intel específicamente
+
+Si tienes una Mac con procesador Intel (2019 o anterior):
+
+```bash
+git clone https://github.com/Maxbuble/DUKATOR.git
+cd DUKATOR
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Instalar FFmpeg si no lo tienes
+brew install ffmpeg
+
+# Compilar
+pyinstaller DUKATOR.spec --clean --noconfirm
+
+# El archivo estará en dist/DUKATOR.app
 ```
 
 ## Fuentes Soportadas
@@ -70,15 +121,30 @@ chmod +x compilar_mac.sh
 
 ```
 DUKATOR/
-├── dukator.py           # Código principal
-├── DUKATOR.spec         # Config PyInstaller
-├── compilar_final.bat   # Compilar Windows
-├── compilar_mac.sh      # Compilar macOS
+├── dukator.py           # Código principal (single-file)
+├── DUKATOR.spec         # Configuración PyInstaller
+├── compilar_final.bat   # Script Windows
+├── compilar_mac.sh      # Script macOS
 ├── requirements.txt     # Dependencias Python
 ├── dukator.ico         # Icono
-└── ffmpeg.exe          # FFmpeg (Windows)
+└── README.md           # Este archivo
 ```
+
+## Notas sobre macOS Intel
+
+GitHub Actions (la plataforma de CI/CD gratuita) ya no ofrece runners Mac Intel. Por eso:
+- **Mac ARM**: Build automático disponible
+- **Mac Intel**: Debes compilar desde el código fuente
+
+La compilación es sencilla y toma ~2 minutos siguiendo las instrucciones de arriba.
 
 ## Licencia
 
 MIT License
+
+## Soporte
+
+Si tienes problemas:
+1. Verifica que cumples los [requisitos](#requisitos)
+2. Para Mac Intel, asegúrate de compilar desde código
+3. Abre un [Issue](https://github.com/Maxbuble/DUKATOR/issues) si persiste el problema
