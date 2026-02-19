@@ -5,24 +5,8 @@ on:
     types: [published]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            artifact_name: DUKATOR.exe
-            artifact_path: dist/DUKATOR.exe
-            ext: .exe
-          - os: macos-13
-            artifact_name: DUKATOR-Intel.app
-            artifact_path: dist/DUKATOR.app
-            ext: .app
-          - os: macos-14
-            artifact_name: DUKATOR-ARM.app
-            artifact_path: dist/DUKATOR.app
-            ext: .app
-    
+  build-windows:
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,8 +16,37 @@ jobs:
         with:
           python-version: '3.12'
       
-      - name: Install FFmpeg (macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Install FFmpeg
+        run: choco install ffmpeg -y
+        shell: powershell
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build with PyInstaller
+        run: pyinstaller DUKATOR.spec --clean --noconfirm
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DUKATOR.exe
+          path: dist/DUKATOR.exe
+          retention-days: 5
+
+  build-macos-intel:
+    runs-on: macos-13
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install FFmpeg
         run: brew install ffmpeg
       
       - name: Install dependencies
@@ -47,12 +60,41 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          name: DUKATOR-Intel.app
+          path: dist/DUKATOR.app
+          retention-days: 5
+
+  build-macos-arm:
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install FFmpeg
+        run: brew install ffmpeg
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build with PyInstaller
+        run: pyinstaller DUKATOR.spec --clean --noconfirm
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DUKATOR-ARM.app
+          path: dist/DUKATOR.app
           retention-days: 5
 
   release:
-    needs: build
+    needs: [build-windows, build-macos-intel, build-macos-arm]
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     
@@ -61,6 +103,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          merge-multiple: true
       
       - name: Display structure
         run: ls -R artifacts
