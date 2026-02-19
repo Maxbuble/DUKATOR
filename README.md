@@ -36,18 +36,26 @@ Descargador de música multiplataforma para Windows y macOS.
 
 ## Descargas
 
-Ve a [Releases](https://github.com/Maxbuble/DUKATOR/releases) para descargar la última versión.
+Ve a [Releases](https://github.com/Maxbuble/DUKATOR/releases/latest) para descargar la última versión.
 
-### Instrucciones de uso
+> **⚠️ Nota:** Solo descarga el archivo ejecutable para tu plataforma. **No necesitas** descargar el "Source code".
 
-#### Windows
-1. Descargar `DUKATOR.exe` del release
-2. Ejecutar directamente
+### Windows
+1. Descarga solo **`DUKATOR.exe`** (~37 MB)
+2. Haz doble click para ejecutar
+3. ¡Listo! No requiere instalación
 
-#### macOS ARM (M1/M2/M3)
-1. Descargar `DUKATOR-ARM.app` del release
-2. Si aparece error de seguridad: **Clic derecho → Abrir → Abrir de todos modos**
-3. Instalar FFmpeg: `brew install ffmpeg`
+### macOS ARM (M1/M2/M3)
+1. Descarga **`DUKATOR-ARM.app.tar.gz`** (~34 MB)
+2. Descomprime el archivo
+3. Haz doble click en `DUKATOR-ARM.app`
+4. Si aparece error de seguridad: **Clic derecho → Abrir → Abrir de todos modos**
+5. Requiere FFmpeg: `brew install ffmpeg` (solo una vez)
+
+### ¿Qué NO descargar?
+❌ `Source code (zip)` - Código fuente, no necesario para usuarios  
+❌ `Source code (tar.gz)` - Código fuente, no necesario para usuarios  
+❌ Otros archivos del repositorio - Solo necesitas el ejecutable
 
 #### macOS Intel
 Ver [Compilar desde código](#compilar-desde-código)
