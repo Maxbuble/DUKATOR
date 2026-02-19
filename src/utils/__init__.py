@@ -1,1 +1,0 @@
-# Archivos __init__.py vacíos para marcar directorios como paquetes
