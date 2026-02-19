@@ -20,6 +20,17 @@ jobs:
         run: choco install ffmpeg -y
         shell: powershell
       
+      - name: Copy FFmpeg files
+        run: |
+          $ffmpegPath = (Get-Command ffmpeg).Source
+          $ffmpegDir = Split-Path $ffmpegPath
+          Copy-Item "$ffmpegDir\ffmpeg.exe" .
+          Copy-Item "$ffmpegDir\ffprobe.exe" .
+          Copy-Item "$ffmpegDir\*.dll" . -ErrorAction SilentlyContinue
+          Write-Host "FFmpeg files copied successfully"
+          Get-ChildItem *.exe, *.dll 2>$null | Select-Object Name
+        shell: powershell
+      
       - name: Install dependencies
         run: |
           pip install --upgrade pip
